@@ -1,0 +1,50 @@
+POST http://localhost:5000/locals/add-local
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "zielonymost",
+  "name": "Zielony Most"
+}
+
+###
+
+POST http://localhost:5000/locals/add-alias
+Content-Type: application/json
+Accept: application/json
+
+{
+  "localId": "masalahouse",
+  "alias": "Masala"
+}
+
+###
+
+POST http://localhost:5000/locals/rename-local
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "masalahouse",
+  "newName": "Masala House"
+}
+
+###
+
+GET http://localhost:5000/locals
+
+###
+
+
+POST http://localhost:5000/orders/order-item
+Content-Type: application/json
+Accept: application/json
+
+{
+  "localId": "masalahouse",
+  "itemName": "Tikka Masala",
+  "personName": "AndrzejN"
+}
+
+###
+
