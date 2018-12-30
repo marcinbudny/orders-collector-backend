@@ -17,10 +17,12 @@ namespace OrdersCollector.Domain.Local
             _store = store;
         }
 
-        private async Task AppendEvent(string streamId, object @event, int expectedVersion = 0)
+        private async Task AppendEvent(string streamId, object @event, int expectedVersion = 0, string commandId = null)
         {
             using (var session = _store.OpenSession())
             {
+                if (@event is EventMetadata em)
+                    em.RaisedByCommandId = commandId;
                 session.Events.Append(streamId, expectedVersion, @event);
 
                 await session.SaveChangesAsync();
@@ -33,7 +35,7 @@ namespace OrdersCollector.Domain.Local
             LocalName.ValidateOrThrow(command.Name);
             try
             {
-                await AppendEvent(command.Id, new LocalAdded(command.Id, command.Name), expectedVersion: 1);
+                await AppendEvent(command.Id, new LocalAdded(command.Id, command.Name), expectedVersion: 1, command.CommandId);
             }
             catch(EventStreamUnexpectedMaxEventIdException)
             {
@@ -45,27 +47,27 @@ namespace OrdersCollector.Domain.Local
         {
             IdValue.ValidateOrThrow(command.Id);
             LocalName.ValidateOrThrow(command.NewName);
-            await AppendEvent(command.Id, new LocalRenamed(command.Id, command.NewName));
+            await AppendEvent(command.Id, new LocalRenamed(command.Id, command.NewName), commandId: command.CommandId);
         }
         
         public async Task Handle(RemoveLocal command)
         {
             IdValue.ValidateOrThrow(command.Id);
-            await AppendEvent(command.Id, new LocalRemoved(command.Id));
+            await AppendEvent(command.Id, new LocalRemoved(command.Id), commandId: command.CommandId);
         }
 
         public async Task Handle(AddLocalAlias command)
         {
             IdValue.ValidateOrThrow(command.LocalId);
             LocalName.ValidateOrThrow(command.Alias);
-            await AppendEvent(command.LocalId, new LocalAliasAdded(command.LocalId, command.Alias));
+            await AppendEvent(command.LocalId, new LocalAliasAdded(command.LocalId, command.Alias), commandId: command.CommandId);
         }
 
         public async Task Handle(RemoveLocalAlias command)
         {
             IdValue.ValidateOrThrow(command.LocalId);
             LocalName.ValidateOrThrow(command.Alias);
-            await AppendEvent(command.LocalId, new LocalAliasRemoved(command.LocalId, command.Alias));
+            await AppendEvent(command.LocalId, new LocalAliasRemoved(command.LocalId, command.Alias), commandId: command.CommandId);
         }
     }
 }

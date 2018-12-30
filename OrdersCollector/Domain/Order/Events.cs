@@ -4,7 +4,7 @@ namespace OrdersCollector.Domain.Order
 {
     namespace Events.V1
     {
-        public class NewOrderStarted
+        public class NewOrderStarted : EventMetadata
         {
             public string OrderId { get; }
 
@@ -20,7 +20,7 @@ namespace OrdersCollector.Domain.Order
             }
         }
 
-        public class OrderItemAdded
+        public class OrderItemAdded : EventMetadata
         {
             public string OrderId { get; }
 
@@ -39,7 +39,7 @@ namespace OrdersCollector.Domain.Order
             }
         }
 
-        public class OrderResponsiblePersonSelected
+        public class OrderResponsiblePersonSelected : EventMetadata
         {
             public string OrderId { get; }
 
@@ -52,7 +52,7 @@ namespace OrdersCollector.Domain.Order
             }
         }
 
-        public class OrderItemRemoved
+        public class OrderItemRemoved : EventMetadata
         {
             public string OrderId { get; }
 
@@ -68,7 +68,7 @@ namespace OrdersCollector.Domain.Order
             }
         }
 
-        public class OrderResponsiblePersonRemoved
+        public class OrderResponsiblePersonRemoved : EventMetadata
         {
             public string OrderId { get; }
 

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Marten;
+using OrdersCollector.Domain;
 
 namespace OrdersCollector.Utils
 {
@@ -9,7 +10,7 @@ namespace OrdersCollector.Utils
     {
         Task<TAggregateRoot> LoadById(string id);  
 
-        Task Save(TAggregateRoot aggregateRoot); 
+        Task Save(TAggregateRoot aggregateRoot, string commandId = null); 
     }
     
     public class Repository<TAggregateRoot> : IRepository<TAggregateRoot>
@@ -38,10 +39,16 @@ namespace OrdersCollector.Utils
             }
         }
 
-        public async Task Save(TAggregateRoot aggregateRoot)
+        public async Task Save(TAggregateRoot aggregateRoot, string commandId = null)
         {
             using(var session = _store.OpenSession())
             {
+                aggregateRoot.PublishedEvents.ForEach(e =>
+                {
+                    if (e is EventMetadata em)
+                        em.RaisedByCommandId = commandId;
+                });
+                
                 session.Events.Append(
                     aggregateRoot.Id, 
                     aggregateRoot.Version, 

@@ -2,10 +2,10 @@
 {
     namespace Events.V1
     {
-        public class LocalAdded
+        public class LocalAdded : EventMetadata
         {
             public string Id { get; }
-        
+
             public string Name { get; }
 
             public LocalAdded(string id, string name)
@@ -15,10 +15,10 @@
             }
         }
 
-        public class LocalRenamed
+        public class LocalRenamed : EventMetadata
         {
             public string Id { get; }
-        
+
             public string NewName { get; }
 
             public LocalRenamed(string id, string newName)
@@ -28,7 +28,7 @@
             }
         }
 
-        public class LocalRemoved
+        public class LocalRemoved : EventMetadata
         {
             public string Id { get; }
 
@@ -38,7 +38,7 @@
             }
         }
 
-        public class LocalAliasAdded
+        public class LocalAliasAdded : EventMetadata
         {
             public string LocalId { get; }
 
@@ -51,7 +51,7 @@
             }
         }
 
-        public class LocalAliasRemoved
+        public class LocalAliasRemoved : EventMetadata
         {
             public string LocalId { get; }
 

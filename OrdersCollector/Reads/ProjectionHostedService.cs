@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using Baseline.Dates;
 using Marten;
 using Marten.Events.Projections.Async;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +32,11 @@ namespace OrdersCollector.Reads
         {
             Logger.Information("Projections starting");
             
-            var settings = new DaemonSettings();
+            var settings = new DaemonSettings
+            {
+                FetchingCooldown = 500.Milliseconds(),
+                LeadingEdgeBuffer = 100.Milliseconds()
+            };
            
             _daemon = _store.BuildProjectionDaemon(
                 logger: new SerilogDaemonLogger(),

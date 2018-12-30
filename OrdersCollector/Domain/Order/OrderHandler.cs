@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.Mvc.Internal;
 using OrdersCollector.Domain.Order.Commands.V1;
 using OrdersCollector.Utils;
 
@@ -26,19 +28,19 @@ namespace OrdersCollector.Domain.Order
 
             order.OrderNewItem(cmd.ItemName, cmd.PersonName, addedAt: _timeProvider.UtcNow);
 
-            await _repository.Save(order);
+            await _repository.Save(order, cmd.CommandId);
 
             return orderId.Value;
         }
         
         public async Task Handle(RemoveItem command) => 
-            await Update(command?.OrderId, order => order.RemoveItem(from: command?.PersonName));
+            await Update(command?.OrderId, order => order.RemoveItem(from: command?.PersonName), command?.CommandId);
 
 
         public async Task Handle(SelectResponsiblePerson command) => 
-            await Update(command?.OrderId, order => order.SelectResponsiblePerson());
+            await Update(command?.OrderId, order => order.SelectResponsiblePerson(), command?.CommandId);
 
-        public async Task Update(string id, Action<Order> update)
+        public async Task Update(string id, Action<Order> update, string commandId = null)
         {
             if(string.IsNullOrWhiteSpace(id))
                 throw new DomainException($"Order id cannot be empty", ErrorCode.IdCannotBeEmpty);
@@ -49,7 +51,7 @@ namespace OrdersCollector.Domain.Order
 
             update(order);
 
-            await _repository.Save(order);
+            await _repository.Save(order, commandId);
         }
     }
 }
